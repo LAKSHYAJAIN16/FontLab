@@ -72,7 +72,12 @@ class Experiment(UUIDPrimaryKeyMixin, Base):
 
     project: Mapped[Project] = relationship(back_populates="experiments")
     goal: Mapped[Goal] = relationship(back_populates="experiments")
-    variants: Mapped[list["Variant"]] = relationship(back_populates="experiment", cascade="all, delete-orphan")
+    # order_by matters: assignment.assign_variant_index() hashes a position in this list,
+    # so it must resolve identically on every query. created_at alone can tie (Postgres
+    # now() is constant within a transaction), so id breaks ties deterministically.
+    variants: Mapped[list["Variant"]] = relationship(
+        back_populates="experiment", cascade="all, delete-orphan", order_by="Variant.created_at, Variant.id"
+    )
 
 
 class Variant(UUIDPrimaryKeyMixin, Base):
