@@ -9,6 +9,20 @@
 > An autonomous experimentation engine that continuously discovers and tests small website design improvements.
 > 
 
+## Repo Layout
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full system design.
+
+```
+packages/sdk/          TypeScript browser SDK (variant assignment, DOM mutation, event tracking)
+apps/dashboard/        Next.js dashboard
+services/api/          FastAPI backend (experiment CRUD, /config + /events)
+services/optimizer/    Python optimization engine (bandits, Bayesian search)
+```
+
+JS/TS packages are a pnpm workspace (`pnpm install`, `pnpm build`, `pnpm dev`, orchestrated via Turborepo).
+Python services are a uv workspace (`uv sync --all-packages`, `uv run --project services/api main.py`).
+
 ## Overview
 
 MicroTune is a system that automatically improves website design through live experimentation.

@@ -1,0 +1,10 @@
+[project]
+name = "microtune-workspace"
+version = "0.1.0"
+description = "MicroTune Python workspace root (services/api, services/optimizer)."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv.workspace]
+members = ["services/*"]

@@ -1,0 +1,24 @@
+{
+  "name": "@microtune/sdk",
+  "version": "0.0.1",
+  "private": true,
+  "description": "MicroTune browser SDK: variant assignment, safe DOM mutation, and event tracking.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
