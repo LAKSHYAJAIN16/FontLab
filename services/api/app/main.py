@@ -1,6 +1,9 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from app.routers import config, events, health
+load_dotenv()
+
+from app.routers import config, events, health  # noqa: E402 — routers may read env-dependent settings (e.g. DATABASE_URL) at import time
 
 app = FastAPI(title="MicroTune API")
 
