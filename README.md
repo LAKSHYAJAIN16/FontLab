@@ -1,27 +1,50 @@
-# FontLab / WebLab
+# MicroTune (FontLab / WebLab)
 
-# Autonomous Website Micro-Optimization
+**MicroTune** is an autonomous experimentation engine: install one SDK script tag, define a conversion goal, and it continuously proposes small, safe CSS/design changes (font size, spacing, CTA padding, alignment, etc.), serves them as A/B variants to visitors, and measures which ones move the goal metric — without a human hand-authoring each test. This repo (locally named `FontLab`, also referred to as `WebLab`) is the monorepo for the SDK, API, dashboard, and optimization engine.
 
-## Working Name
+## Current Implementation Status
 
-**MicroTune**
+This is an early-stage project. What's actually built today vs. still aspirational:
 
-> An autonomous experimentation engine that continuously discovers and tests small website design improvements.
-> 
+**Implemented:**
+- `packages/sdk` — browser SDK (`MicroTune.init()`, `MicroTune.goal()`): fetches assigned variants from `/config`, applies CSS patches to the DOM, and reports impressions/goal completions to `/events` via `sendBeacon`.
+- `services/api` — FastAPI backend with `/health`, `/config` (deterministic, hash-based variant assignment per visitor — see `app/assignment.py`), and `/events` routes, a SQLAlchemy/Postgres schema (`Project`, `Goal`, `Experiment`, `Variant`, `MutationConstraint`) and Alembic migrations.
+
+**Scaffolded but not yet implemented:**
+- `services/optimizer` — Python package (`microtune_optimizer`) intended to host the bandit/Bayesian optimization logic described below; currently just a package stub.
+- `services/shared` — Python package (`microtune_shared`) for code shared between `api` and `optimizer`; currently just a package stub.
+- `apps/dashboard` — Next.js app; currently the unmodified `create-next-app` starter, not yet wired to the API.
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the actual infrastructure design (Cloudflare Workers, Neon Postgres, ClickHouse, Fly.io) this system is being built toward, including what's deliberately deferred. Everything below "## Overview" in this file is the original product vision/pitch that motivated the project — treat it as direction, not a changelog of what exists.
 
 ## Repo Layout
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full system design.
-
 ```
-packages/sdk/          TypeScript browser SDK (variant assignment, DOM mutation, event tracking)
-apps/dashboard/        Next.js dashboard
-services/api/          FastAPI backend (experiment CRUD, /config + /events)
-services/optimizer/    Python optimization engine (bandits, Bayesian search)
+packages/sdk/          TypeScript browser SDK (variant assignment, DOM mutation, event tracking) — implemented
+apps/dashboard/         Next.js dashboard — scaffold only
+services/api/           FastAPI backend (experiment CRUD, /config + /events) — implemented
+services/optimizer/     Python optimization engine (bandits, Bayesian search) — stub
+services/shared/        Python package shared by api + optimizer — stub
 ```
 
 JS/TS packages are a pnpm workspace (`pnpm install`, `pnpm build`, `pnpm dev`, orchestrated via Turborepo).
 Python services are a uv workspace (`uv sync --all-packages`, `uv run --project services/api main.py`).
+
+## Setup
+
+### JS/TS (SDK + dashboard)
+```bash
+pnpm install
+pnpm build   # or: pnpm dev
+```
+
+### Python (API + optimizer)
+```bash
+uv sync --all-packages
+cp services/api/.env.example services/api/.env   # fill in DATABASE_URL (e.g. a Neon Postgres connection string)
+uv run --project services/api alembic upgrade head
+uv run --project services/api main.py             # runs the FastAPI app (see services/api/main.py)
+```
 
 ## Overview
 
